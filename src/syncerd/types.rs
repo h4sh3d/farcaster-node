@@ -18,43 +18,65 @@ use strict_encoding::{StrictDecode, StrictEncode};
 //     }
 // }
 
-// impl lightning_encoding::Strategy for monero::PublicKey {
-    // type Strategy = lightning_encoding::strategies::AsStrict;
-// }
+pub mod xmr {
+    use monero::consensus::Decodable;
+    use monero::consensus::Encodable;
+    use strict_encoding::{StrictDecode, StrictEncode};
 
-impl strict_encoding::Strategy for monero::PublicKey {
-    type Strategy = strict_encoding::strategies::HashFixedBytes;
-}
+    #[derive(Clone, Debug, Eq, PartialEq, Hash)]
+    pub struct PublicKey(monero::PublicKey);
 
-impl StrictEncode for monero::PublicKey {
-    fn strict_encode<E: std::io::Write>(&self, e: E) -> Result<usize, strict_encoding::Error> {
-        // self.consensus_encode(s: &mut S)
-        self.consensus_encode(&mut e).map_err(strict_encoding::Error::from)
+    //impl lightning_encoding::Strategy for monero::PublicKey {
+    //    type Strategy = lightning_encoding::strategies::AsStrict;
+    //}
+
+    //impl strict_encoding::Strategy for monero::PublicKey {
+    //    type Strategy = strict_encoding::strategies::HashFixedBytes;
+    //}
+    //
+
+    impl StrictEncode for PublicKey {
+        fn strict_encode<E: std::io::Write>(&self, e: E) -> Result<usize, strict_encoding::Error> {
+            // self.consensus_encode(s: &mut S)
+            self.0
+                .consensus_encode(&mut e)
+                .map_err(strict_encoding::Error::from)
+        }
     }
-}
 
-impl StrictDecode for monero::PublicKey {
-    fn strict_decode<D: std::io::Read>(d: D) -> Result<Self, strict_encoding::Error> {
-        monero::consensus::Decodable::consensus_decode(&mut d).map_err(|e| strict_encoding::Error::DataIntegrityError(e.to_string()))
+    impl StrictDecode for PublicKey {
+        fn strict_decode<D: std::io::Read>(d: D) -> Result<Self, strict_encoding::Error> {
+            Ok(Self(
+                monero::consensus::Decodable::consensus_decode(&mut d)
+                    .map_err(|e| strict_encoding::Error::DataIntegrityError(e.to_string()))?,
+            ))
+        }
     }
-}
 
-impl StrictEncode for monero::PrivateKey {
-    fn strict_encode<E: std::io::Write>(&self, e: E) -> Result<usize, strict_encoding::Error> {
-        monero::consensus::Encodable::consensus_encode(&self, &mut e).map_err(strict_encoding::Error::from)
+    #[derive(Clone, Debug, Eq, PartialEq, Hash)]
+    pub struct PrivateKey(monero::PrivateKey);
+    impl StrictEncode for PrivateKey {
+        fn strict_encode<E: std::io::Write>(&self, e: E) -> Result<usize, strict_encoding::Error> {
+            self.0
+                .consensus_encode(&mut e)
+                .map_err(strict_encoding::Error::from)
+        }
     }
-}
 
-impl StrictDecode for monero::PrivateKey {
-    fn strict_decode<D: std::io::Read>(d: D) -> Result<Self, strict_encoding::Error> {
-        monero::consensus::Decodable::consensus_decode(&mut d).map_err(|e| strict_encoding::Error::DataIntegrityError(e.to_string()))
+    impl StrictDecode for PrivateKey {
+        fn strict_decode<D: std::io::Read>(d: D) -> Result<Self, strict_encoding::Error> {
+            Ok(Self(
+                monero::consensus::Decodable::consensus_decode(&mut d)
+                    .map_err(|e| strict_encoding::Error::DataIntegrityError(e.to_string()))?,
+            ))
+        }
     }
 }
 
 // impl lightning_encoding::Strategy for monero::Address {
-    // type Strategy = lightning_encoding::strategies::AsStrict;
+// type Strategy = lightning_encoding::strategies::AsStrict;
 // }
-// 
+//
 // impl_strict_encoding!(monero::Address);
 
 #[derive(Clone, Debug, Display, StrictEncode, StrictDecode, Eq, PartialEq, Hash)]
@@ -78,8 +100,8 @@ pub struct BtcAddressAddendum {
 #[derive(Clone, Debug, Display, StrictEncode, StrictDecode, Eq, PartialEq, Hash)]
 #[display(Debug)]
 pub struct XmrAddressAddendum {
-    pub spend_key: monero::PublicKey,
-    pub view_key: monero::PrivateKey,
+    pub spend_key: xmr::PublicKey,
+    pub view_key: xmr::PrivateKey,
     /// The blockchain height where to start the query (not inclusive).
     pub from_height: u64,
 }
@@ -102,8 +124,8 @@ pub enum SweepAddressAddendum {
 #[derive(Clone, Debug, Display, StrictEncode, StrictDecode, Eq, PartialEq, Hash)]
 #[display(Debug)]
 pub struct SweepXmrAddress {
-    pub spend_key: monero::PrivateKey,
-    pub view_key: monero::PrivateKey,
+    pub spend_key: xmr::PrivateKey,
+    pub view_key: xmr::PrivateKey,
     pub address: String,
 }
 

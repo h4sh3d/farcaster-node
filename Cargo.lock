@@ -125,9 +125,9 @@ checksum = "5024ee8015f02155eee35c711107ddd9a9bf3cb689cf2a9089c97e79b6e1ae83"
 
 [[package]]
 name = "base58-monero"
-version = "0.3.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "465ba1f408efdef4d9379bdfa7340899b63e472d50c7fb666480ccfd5a893e53"
+checksum = "1df741a56140a4d26932fde3bd69ce8abec7f50d238f8c16351caa789a6d8fe9"
 dependencies = [
  "thiserror",
 ]
@@ -901,7 +901,7 @@ dependencies = [
  "hex",
  "inet2_addr",
  "lightning_encoding",
- "monero 0.15.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "monero",
  "rand 0.7.3",
  "rand 0.8.4",
  "rand_chacha 0.3.1",
@@ -945,7 +945,7 @@ dependencies = [
  "lnpbp",
  "log",
  "microservices",
- "monero 0.15.0 (git+https://github.com/monero-rs/monero-rs?branch=main)",
+ "monero",
  "monero-rpc",
  "nix",
  "paste",
@@ -1731,21 +1731,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "monero"
-version = "0.15.0"
-source = "git+https://github.com/monero-rs/monero-rs?branch=main#eada552a81e7670204e97b541d1d4ca3ce46cfa2"
-dependencies = [
- "base58-monero",
- "curve25519-dalek",
- "fixed-hash",
- "hex",
- "hex-literal",
- "sealed",
- "thiserror",
- "tiny-keccak",
-]
-
-[[package]]
 name = "monero-rpc"
 version = "0.1.0"
 source = "git+https://github.com/monero-ecosystem/monero-rpc-rs?branch=master#e417ed4607d96d8e0172014e8efbb073c898fbb6"
@@ -1756,7 +1741,7 @@ dependencies = [
  "hex",
  "http",
  "jsonrpc-core",
- "monero 0.15.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "monero",
  "reqwest",
  "serde 1.0.127",
  "serde_json",
