@@ -1153,11 +1153,9 @@ impl Runtime {
                         .unwrap()
                         .elem();
                     let view = view_key_alice + view_key_bob;
-                    // let view_key_bob = params.
                     info!("Full aggregated secret monero view key: {}", view);
 
                     let viewpair = monero::ViewPair { spend, view };
-                    // let address = (swapd.monero_address)(&viewpair);
                     let address =
                         monero::Address::from_viewpair(monero::Network::Stagenet, &viewpair);
 

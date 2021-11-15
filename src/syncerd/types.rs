@@ -1,4 +1,61 @@
+use monero::consensus::Decodable;
+use monero::consensus::Encodable;
 use strict_encoding::{StrictDecode, StrictEncode};
+
+// impl strict_encoding::StrictEncode for monero::Address {
+//     fn strict_encode<E: ::std::io::Write>(
+//         &self, mut e: E,
+//     ) -> Result<usize, strict_encoding::Error> {
+//         Encodable::consensus_encode(self, &mut e)
+//             .map_err(strict_encoding::Error::from)
+//     }
+// }
+
+// impl strict_encoding::StrictDecode for monero::Address {
+//     fn strict_decode<D: ::std::io::Read>(mut d: D) -> Result<Self, strict_encoding::Error> {
+//         Decodable::consensus_decode(&mut d)
+//             .map_err(|e| strict_encoding::Error::DataIntegrityError(e.to_string()))
+//     }
+// }
+
+// impl lightning_encoding::Strategy for monero::PublicKey {
+    // type Strategy = lightning_encoding::strategies::AsStrict;
+// }
+
+impl strict_encoding::Strategy for monero::PublicKey {
+    type Strategy = strict_encoding::strategies::HashFixedBytes;
+}
+
+impl StrictEncode for monero::PublicKey {
+    fn strict_encode<E: std::io::Write>(&self, e: E) -> Result<usize, strict_encoding::Error> {
+        // self.consensus_encode(s: &mut S)
+        self.consensus_encode(&mut e).map_err(strict_encoding::Error::from)
+    }
+}
+
+impl StrictDecode for monero::PublicKey {
+    fn strict_decode<D: std::io::Read>(d: D) -> Result<Self, strict_encoding::Error> {
+        monero::consensus::Decodable::consensus_decode(&mut d).map_err(|e| strict_encoding::Error::DataIntegrityError(e.to_string()))
+    }
+}
+
+impl StrictEncode for monero::PrivateKey {
+    fn strict_encode<E: std::io::Write>(&self, e: E) -> Result<usize, strict_encoding::Error> {
+        monero::consensus::Encodable::consensus_encode(&self, &mut e).map_err(strict_encoding::Error::from)
+    }
+}
+
+impl StrictDecode for monero::PrivateKey {
+    fn strict_decode<D: std::io::Read>(d: D) -> Result<Self, strict_encoding::Error> {
+        monero::consensus::Decodable::consensus_decode(&mut d).map_err(|e| strict_encoding::Error::DataIntegrityError(e.to_string()))
+    }
+}
+
+// impl lightning_encoding::Strategy for monero::Address {
+    // type Strategy = lightning_encoding::strategies::AsStrict;
+// }
+// 
+// impl_strict_encoding!(monero::Address);
 
 #[derive(Clone, Debug, Display, StrictEncode, StrictDecode, Eq, PartialEq, Hash)]
 #[display(Debug)]
