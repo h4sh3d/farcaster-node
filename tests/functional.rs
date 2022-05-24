@@ -931,7 +931,7 @@ fn create_bitcoin_syncer(
         "--coin",
         "Bitcoin",
         "--electrum-server",
-        &format!("tcp://{}:50001", ehost),
+        &format!("tcp://{}:60401", ehost),
     ]));
 
     syncer
@@ -1732,7 +1732,7 @@ fn create_monero_syncer(
     let whost = env::var("MONERO_WALLET_HOST_2").unwrap_or("localhost".into());
     let lhost = env::var("MONERO_LWS_HOST").unwrap_or("localhost".into());
 
-    let lws_wallet = &format!("http://{}:38884", lhost);
+    let lws_wallet = &format!("http://{}:8443", lhost);
 
     let wallet_server = if lws {
         vec!["--monero-lws", lws_wallet]
