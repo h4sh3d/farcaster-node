@@ -71,7 +71,7 @@ jobs:
         volumes:
           - bitcoind-data:/data
       electrs:
-        image: ghcr.io/farcaster-project/containers/electrs:0.9.7
+        image: ghcr.io/farcaster-project/containers/electrs:0.8.11
         env:
           NETWORK: regtest
           DAEMON_RPC_ADDR: bitcoind:18443

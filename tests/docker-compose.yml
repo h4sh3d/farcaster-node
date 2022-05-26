@@ -10,7 +10,7 @@ services:
             - 18443:18443
             - 18444:18444
     electrs:
-        image: ghcr.io/farcaster-project/containers/electrs:0.9.7
+        image: ghcr.io/farcaster-project/containers/electrs:0.8.11
         environment:
             NETWORK: regtest
             DAEMON_RPC_ADDR: bitcoind:18443
