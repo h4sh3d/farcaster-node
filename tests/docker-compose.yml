@@ -66,4 +66,4 @@ services:
         depends_on:
             - "monerod"
         ports:
-            - 8443:8443
+            - 38884:38884
