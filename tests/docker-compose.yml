@@ -1,12 +1,11 @@
 version: "3.7"
 services:
-    bitcoin-core:
+    bitcoind:
         image: ghcr.io/farcaster-project/containers/bitcoin-core:23.0
         environment:
             NETWORK: regtest
         volumes:
             - ./data_dir:/data
-        command: "/usr/bin/bitcoind -chain=regtest -server -rest -txindex -rpcbind=0.0.0.0 -rpcallowip=0.0.0.0/0 -fallbackfee=0.00001 -datadir=/data"
         ports:
             - 18443:18443
             - 18444:18444
@@ -14,12 +13,11 @@ services:
         image: ghcr.io/farcaster-project/containers/electrs:0.9.7
         environment:
             NETWORK: regtest
-            DAEMON_RPC_ADDR: bitcoin-core:18443
-            DAEMON_P2P_ADDR: bitcoin-core:18444
+            DAEMON_RPC_ADDR: bitcoind:18443
+            DAEMON_P2P_ADDR: bitcoind:18444
             ELECTRUM_RPC_PORT: 60401
-        command: "/usr/bin/electrs --log-filters INFO --network regtest --daemon-dir /data --daemon-rpc-addr bitcoin-core:18443 --daemon-p2p-addr bitcoin-core:18444 --electrum-rpc-addr 0.0.0.0:60401"
         depends_on:
-            - "bitcoin-core"
+            - "bitcoind"
         volumes:
             - ./data_dir:/data
         ports:
@@ -63,9 +61,8 @@ services:
     monero-lws-daemon:
         image: ghcr.io/farcaster-project/containers/monero-lws:latest
         environment:
-            MONERO_DAEMON_ADDRESS: monerod:18082
             NETWORK: main
-        command: "/usr/bin/monero-lws-daemon --network main --daemon tcp://monerod:18082 --confirm-external-bind --rest-server http://0.0.0.0:8443 --auto-accept-requests --db-path /data"
+            MONERO_DAEMON_ADDRESS: monerod:18082
         depends_on:
             - "monerod"
         ports:
