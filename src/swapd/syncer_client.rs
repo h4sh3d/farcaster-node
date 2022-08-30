@@ -126,7 +126,7 @@ impl SyncerState {
             "{} | Watching {} transaction ({})",
             self.swap_id.bright_blue_italic(),
             tx_label.bright_white_bold(),
-            txid.bright_yellow_italic()
+            txid.tx()
         );
         let task = Task::WatchTransaction(WatchTransaction {
             id,
@@ -147,7 +147,7 @@ impl SyncerState {
             "{} | Watching {} transaction ({})",
             self.swap_id.bright_blue_italic(),
             tx_label.bright_white_bold(),
-            hex::encode(&hash).bright_yellow_italic(),
+            hex::encode(&hash).tx(),
         );
         debug!("Watching transaction {} with {}", hex::encode(&hash), id);
         let task = Task::WatchTransaction(WatchTransaction {
@@ -178,7 +178,7 @@ impl SyncerState {
         info!(
             "{} | Watching address {} for {} transaction",
             self.swap_id.bright_blue_italic(),
-            address.bright_blue_italic(),
+            address.addr(),
             tx_label.bright_white_bold(),
         );
         let addendum = BtcAddressAddendum {
@@ -241,7 +241,7 @@ impl SyncerState {
             "{} | Watching {} on address {}",
             self.swap_id.bright_blue_italic(),
             tx_label.bright_white_bold(),
-            address
+            address.addr(),
         );
 
         let watch_addr = WatchAddress {

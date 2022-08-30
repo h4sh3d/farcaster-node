@@ -1384,7 +1384,7 @@ impl Runtime {
                         let tx = bitcoin::Transaction::deserialize(tx)?;
                         info!(
                             "Received AddressTransaction, processing tx {}",
-                            &tx.txid().addr()
+                            &tx.txid().tx()
                         );
                         let txlabel = self.syncer_state.tasks.watched_addrs.get(id).unwrap();
                         match txlabel {

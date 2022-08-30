@@ -401,7 +401,7 @@ impl Runtime {
                         ))
                     } else {
                         let service_id = ServiceId::Syncer(blockchain, network);
-                        info!("Terminating {}", &service_id);
+                        info!("Terminating {}", service_id.bright_white_bold());
                         if endpoints
                             .send_to(
                                 ServiceBus::Ctl,
@@ -1823,7 +1823,7 @@ impl Runtime {
                             Some(((blockchain, network), xs))
                         } else {
                             let service_id = ServiceId::Syncer(blockchain, network);
-                            info!("Terminating {}", service_id);
+                            info!("Terminating {}", service_id.bright_white_bold());
                             if endpoints
                                 .send_to(
                                     ServiceBus::Ctl,
