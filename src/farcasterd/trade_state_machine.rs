@@ -574,7 +574,7 @@ fn attempt_transition_to_taker_committed(
                 let xmr_addr_req =
                     BusMsg::Ctl(Ctl::MoneroAddress(MoneroAddress(swap_id, acc_addr)));
                 event.send_msg_service(ServiceId::Wallet, xmr_addr_req)?;
-                info!("passing request to walletd from {}", event.source);
+                debug!("passing request to walletd from {}", event.source);
                 event.forward_msg(ServiceId::Wallet)?;
                 event.complete_ctl_service(
                     ServiceId::Database,
@@ -602,7 +602,7 @@ fn attempt_transition_to_taker_committed(
         (BusMsg::Ctl(Ctl::RevokeOffer(revoke_public_offer)), _) => {
             debug!("attempting to revoke {}", public_offer);
             if revoke_public_offer == public_offer {
-                info!("Revoked offer {}", public_offer);
+                info!("Revoked offer {}", public_offer.label());
                 event.complete_rpc(BusMsg::Rpc(Rpc::String(
                     "Successfully revoked offer.".to_string(),
                 )))?;
@@ -875,7 +875,7 @@ fn attempt_transition_from_restoring_swapd_to_swapd_running(
         arbitrating_syncer_up.clone(),
         swapd_up,
     ) {
-        info!("Restoring swap {}", swap_id.bright_blue_italic());
+        info!("Restoring swap {}", swap_id.swap_id());
         runtime.stats.incr_initiated();
         event.complete_ctl_service(
             ServiceId::Database,
@@ -954,15 +954,8 @@ fn attempt_transition_to_end(
                     .incr_awaiting_funding(&Blockchain::Bitcoin, swap_id);
                 let network = address.network.into();
                 if let Some(auto_fund_config) = runtime.config.get_auto_funding_config(network) {
-                    info!(
-                        "{} | Attempting to auto-fund Bitcoin",
-                        swap_id.bright_blue_italic()
-                    );
-                    debug!(
-                        "{} | Auto funding config: {:#?}",
-                        swap_id.bright_blue_italic(),
-                        auto_fund_config
-                    );
+                    info!("{} | Attempting to auto-fund Bitcoin", swap_id.swap_id());
+                    debug!("{} | Auto funding config: {:#?}", swap_id, auto_fund_config);
 
                     use bitcoincore_rpc::{Auth, Client, Error, RpcApi};
                     use std::path::PathBuf;
@@ -999,8 +992,8 @@ fn attempt_transition_to_end(
                         Ok(txid) => {
                             info!(
                                 "{} | Auto-funded Bitcoin with txid: {}",
-                                swap_id.bright_blue_italic(),
-                                txid
+                                swap_id.swap_id(),
+                                txid.tx_hash()
                             );
                             Ok(Some(TradeStateMachine::SwapdRunning(SwapdRunning {
                                 peerd,
@@ -1054,15 +1047,8 @@ fn attempt_transition_to_end(
                     .incr_awaiting_funding(&Blockchain::Monero, swap_id);
                 let network = address.network.into();
                 if let Some(auto_fund_config) = runtime.config.get_auto_funding_config(network) {
-                    info!(
-                        "{} | Attempting to auto-fund Monero",
-                        swap_id.bright_blue_italic()
-                    );
-                    debug!(
-                        "{} | Auto funding config: {:#?}",
-                        swap_id.bright_blue_italic(),
-                        auto_fund_config
-                    );
+                    info!("{} | Attempting to auto-fund Monero", swap_id.swap_id());
+                    debug!("{} | Auto funding config: {:#?}", swap_id, auto_fund_config);
                     use tokio::runtime::Builder;
                     let rt = Builder::new_multi_thread()
                         .worker_threads(1)
@@ -1089,8 +1075,8 @@ fn attempt_transition_to_end(
                                 Ok(tx) => {
                                     info!(
                                         "{} | Auto-funded Monero with txid: {}",
-                                        &swap_id.bright_blue_italic(),
-                                        tx.tx_hash.to_string()
+                                        &swap_id.swap_id(),
+                                        tx.tx_hash.tx_hash()
                                     );
                                     auto_funded = true;
                                     break;
@@ -1136,8 +1122,8 @@ fn attempt_transition_to_end(
             runtime.stats.incr_funded(&blockchain, &swap_id);
             info!(
                 "{} | Your {} funding completed",
-                swap_id.bright_blue_italic(),
-                blockchain.bright_green_bold()
+                swap_id.swap_id(),
+                blockchain.label()
             );
             Ok(Some(TradeStateMachine::SwapdRunning(SwapdRunning {
                 peerd,
@@ -1155,8 +1141,8 @@ fn attempt_transition_to_end(
             runtime.stats.incr_funding_canceled(&blockchain, &swap_id);
             info!(
                 "{} | Your {} funding was canceled.",
-                swap_id.bright_blue_italic(),
-                blockchain.bright_green_bold()
+                swap_id.swap_id(),
+                blockchain.label()
             );
             Ok(Some(TradeStateMachine::SwapdRunning(SwapdRunning {
                 peerd,

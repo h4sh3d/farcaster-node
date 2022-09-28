@@ -80,7 +80,11 @@ pub fn run(
     let _databased = launch("databased", empty)?;
 
     if config.is_auto_funding_enable() {
-        info!("farcasterd will attempt to fund automatically");
+        info!(
+            "{} will attempt to {}",
+            "farcasterd".label(),
+            "fund automatically".label()
+        );
     }
 
     let runtime = Runtime {
@@ -234,7 +238,7 @@ impl Stats {
             refund.bright_white_bold(),
             punish.bright_white_bold(),
             abort.bright_white_bold(),
-            initialized,
+            initialized.bright_white_bold(),
             awaiting_funding_xmr.len().bright_white_bold(),
             awaiting_funding_btc.len().bright_white_bold(),
             funded_xmr.bright_white_bold(),
@@ -432,7 +436,7 @@ impl Runtime {
                         // is not completed, and thus present in consumed_offers
                         let peerd_id = ServiceId::Peer(addr);
                         if self.connection_has_swap_client(&peerd_id) {
-                            info!("a swap is still running over the terminated peer {}, the counterparty will attempt to reconnect.", addr);
+                            info!("A swap is still running over the terminated peer {}, the counterparty will attempt to reconnect.", addr.bright_blue_italic());
                         }
                     }
                 }
@@ -1071,6 +1075,7 @@ impl Runtime {
     ) -> Result<Option<TradeStateMachine>, Error> {
         let event = Event::with(endpoints, self.identity(), source, request);
         let tsm_display = tsm.to_string();
+        let tsm_swap_id = tsm.swap_id();
         if let Some(new_tsm) = tsm.next(event, self)? {
             let new_tsm_display = new_tsm.to_string();
             // relegate state transitions staying the same to debug
@@ -1080,16 +1085,22 @@ impl Runtime {
                     new_tsm.bright_green_bold()
                 );
             } else {
+                let swap_id = tsm_swap_id
+                    .or(new_tsm.swap_id())
+                    .map_or("<>".to_string(), |s| s.to_string());
                 info!(
-                    "Trade state transition {} -> {}",
+                    "{} | Trade state transition {} -> {}",
+                    swap_id.swap_id(),
                     tsm_display.red_bold(),
                     new_tsm.bright_green_bold()
                 );
             }
             Ok(Some(new_tsm))
         } else {
+            let swap_id = tsm_swap_id.map_or("<>".to_string(), |s| s.to_string());
             info!(
-                "Trade state machine ended {} -> {}",
+                "{} | Trade state machine ended {} -> {}",
+                swap_id.swap_id(),
                 tsm_display.red_bold(),
                 "End".to_string().bright_green_bold()
             );
@@ -1261,7 +1272,7 @@ pub fn syncer_up(
             network.to_string(),
         ];
         args.append(&mut syncer_servers_args(config, blockchain, network)?);
-        info!("launching syncer with: {:?}", args);
+        debug!("launching syncer with: {:?}", args);
         launch("syncerd", args)?;
         spawning_services.insert(syncer_service.clone());
     }
@@ -1379,7 +1390,7 @@ pub fn launch(
 
     // Forward tor proxy argument
     let parsed = Opts::parse();
-    info!("tor opts: {:?}", parsed.shared.tor_proxy);
+    debug!("tor opts: {:?}", parsed.shared.tor_proxy);
     if let Some(t) = &matches.value_of("tor-proxy") {
         cmd.args(&["-T", *t]);
     }
