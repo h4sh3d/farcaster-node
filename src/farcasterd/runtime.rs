@@ -1087,7 +1087,7 @@ impl Runtime {
             } else {
                 let swap_id = tsm_swap_id
                     .or(new_tsm.swap_id())
-                    .map_or("<>".to_string(), |s| s.to_string());
+                    .map_or("…".to_string(), |s| s.to_string());
                 info!(
                     "{} | Trade state transition {} -> {}",
                     swap_id.swap_id(),
@@ -1097,7 +1097,7 @@ impl Runtime {
             }
             Ok(Some(new_tsm))
         } else {
-            let swap_id = tsm_swap_id.map_or("<>".to_string(), |s| s.to_string());
+            let swap_id = tsm_swap_id.map_or("…".to_string(), |s| s.to_string());
             info!(
                 "{} | Trade state machine ended {} -> {}",
                 swap_id.swap_id(),
