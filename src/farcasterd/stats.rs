@@ -70,7 +70,7 @@ impl Stats {
             warn!(
                 "{} | This swap wasn't awaiting {} funding",
                 swapid.bright_blue_italic(),
-                "Bitcoin".bright_white_bold()
+                blockchain.bright_white_bold()
             );
         }
     }
@@ -92,7 +92,7 @@ impl Stats {
             warn!(
                 "{} | This swap wasn't awaiting {} funding",
                 swapid.bright_blue_italic(),
-                "Bitcoin".bright_white_bold()
+                blockchain.bright_white_bold()
             );
         }
     }
@@ -119,7 +119,7 @@ impl Stats {
             refund.bright_white_bold(),
             punish.bright_white_bold(),
             abort.bright_white_bold(),
-            initialized,
+            initialized.bright_white_bold(),
             awaiting_funding_xmr.len().bright_white_bold(),
             awaiting_funding_btc.len().bright_white_bold(),
             funded_xmr.bright_white_bold(),
