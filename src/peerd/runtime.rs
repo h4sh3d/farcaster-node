@@ -373,7 +373,7 @@ impl Runtime {
         if message.is_protocol() {
             let swap_id = message.swap_id();
             info!(
-                "{} | Sent {}",
+                "{} | Sent the {} protocol message",
                 swap_id.bright_blue_italic(),
                 message.bright_white_bold()
             );
@@ -552,7 +552,7 @@ impl Runtime {
             BusMsg::Msg(msg) => {
                 let swap_id = msg.swap_id();
                 info!(
-                    "{} | Received {}",
+                    "{} | Received the {} protocol message",
                     swap_id.bright_blue_italic(),
                     msg.bright_white_bold()
                 );
