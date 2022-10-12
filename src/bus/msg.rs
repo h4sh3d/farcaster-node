@@ -106,6 +106,18 @@ impl Msg {
                 | Msg::Pong(_)
         )
     }
+
+    pub fn is_protocol(&self) -> bool {
+        matches!(
+            self,
+            Msg::MakerCommit(_)
+                | Msg::TakerCommit(_)
+                | Msg::Reveal(_)
+                | Msg::RefundProcedureSignatures(_)
+                | Msg::CoreArbitratingSetup(_)
+                | Msg::BuyProcedureSignature(_)
+        )
+    }
 }
 
 #[derive(Clone, Debug, Display, StrictEncode, StrictDecode)]
