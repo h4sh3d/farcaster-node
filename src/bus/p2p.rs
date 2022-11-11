@@ -21,11 +21,14 @@ pub enum PeerMsg {
 
     #[api(type = 33702)]
     #[display("{0} taker commit")]
-    TakerCommit(TakeCommit),
+    TakerCommit(TakerCommit),
 
-    #[api(type = 33703)]
+    //#[api(type = 33703)]
+    //#[display("reveal {0}")]
+    //Reveal(Reveal),
+    #[api(type = 33704)]
     #[display("reveal {0}")]
-    Reveal(Reveal),
+    Reveal2(Reveal2),
 
     #[api(type = 33720)]
     #[display("refund procedure signatures")]
@@ -67,16 +70,14 @@ pub enum PeerMsg {
 impl PeerMsg {
     pub fn swap_id(&self) -> SwapId {
         match self {
-            PeerMsg::MakerCommit(m) => match m {
-                Commit::AliceParameters(n) => n.swap_id,
-                Commit::BobParameters(n) => n.swap_id,
-            },
-            PeerMsg::TakerCommit(TakeCommit { swap_id, .. }) => *swap_id,
-            PeerMsg::Reveal(m) => match m {
-                Reveal::AliceParameters(n) => n.swap_id,
-                Reveal::BobParameters(n) => n.swap_id,
-                Reveal::Proof(n) => n.swap_id,
-            },
+            PeerMsg::MakerCommit(c) => c.swap_id(),
+            PeerMsg::TakerCommit(c) => c.swap_id(),
+            //PeerMsg::Reveal(m) => match m {
+            //    Reveal::AliceParameters(n) => n.swap_id,
+            //    Reveal::BobParameters(n) => n.swap_id,
+            //    Reveal::Proof(n) => n.swap_id,
+            //},
+            PeerMsg::Reveal2(r) => r.swap_id(),
             PeerMsg::RefundProcedureSignatures(RefundProcedureSignatures { swap_id, .. }) => {
                 *swap_id
             }
@@ -100,7 +101,8 @@ impl PeerMsg {
             self,
             PeerMsg::MakerCommit(_)
                 | PeerMsg::TakerCommit(_)
-                | PeerMsg::Reveal(_)
+                //| PeerMsg::Reveal(_)
+                | PeerMsg::Reveal2(_)
                 | PeerMsg::RefundProcedureSignatures(_)
                 | PeerMsg::CoreArbitratingSetup(_)
                 | PeerMsg::BuyProcedureSignature(_)
@@ -114,7 +116,8 @@ impl PeerMsg {
             self,
             PeerMsg::MakerCommit(_)
                 | PeerMsg::TakerCommit(_)
-                | PeerMsg::Reveal(_)
+                //| PeerMsg::Reveal(_)
+                | PeerMsg::Reveal2(_)
                 | PeerMsg::RefundProcedureSignatures(_)
                 | PeerMsg::CoreArbitratingSetup(_)
                 | PeerMsg::BuyProcedureSignature(_)
@@ -122,6 +125,7 @@ impl PeerMsg {
     }
 }
 
+/*
 #[derive(Clone, Debug, Display, StrictEncode, StrictDecode)]
 pub enum Reveal {
     #[display("Alice parameters")]
@@ -131,13 +135,50 @@ pub enum Reveal {
     #[display("proof")]
     Proof(RevealProof),
 }
+*/
+
+#[derive(Clone, Debug, Display, StrictEncode, StrictDecode)]
+pub enum Reveal2 {
+    #[display("Alice")]
+    Alice {
+        parameters: RevealAliceParameters,
+        proof: RevealProof,
+    },
+
+    #[display("Bob")]
+    Bob {
+        parameters: RevealBobParameters,
+        proof: RevealProof,
+    },
+}
+
+impl Reveal2 {
+    pub fn swap_id(&self) -> SwapId {
+        match self {
+            Self::Alice { parameters, .. } => parameters.swap_id,
+            Self::Bob { parameters, .. } => parameters.swap_id,
+        }
+    }
+
+    pub fn validate_ids(&self) -> bool {
+        match self {
+            Self::Alice { parameters, proof } => parameters.swap_id == proof.swap_id,
+            Self::Bob { parameters, proof } => parameters.swap_id == proof.swap_id,
+        }
+    }
+}
 
 #[derive(Clone, Debug, Display, From, StrictDecode, StrictEncode)]
 #[display("{commit}")]
-pub struct TakeCommit {
+pub struct TakerCommit {
     pub commit: Commit,
     pub public_offer: PublicOffer, // TODO: replace by public offer id
-    pub swap_id: SwapId,
+}
+
+impl TakerCommit {
+    pub fn swap_id(&self) -> SwapId {
+        self.commit.swap_id()
+    }
 }
 
 #[derive(Clone, Debug, Display, StrictEncode, StrictDecode)]
@@ -146,4 +187,13 @@ pub enum Commit {
     AliceParameters(CommitAliceParameters),
     #[display("Bob")]
     BobParameters(CommitBobParameters),
+}
+
+impl Commit {
+    pub fn swap_id(&self) -> SwapId {
+        match self {
+            Self::AliceParameters(c) => c.swap_id,
+            Self::BobParameters(c) => c.swap_id,
+        }
+    }
 }
